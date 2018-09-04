@@ -49,5 +49,23 @@ def delete_student():
   output = {'student' : new_stud['student'], 'id' : new_stud['id'], 'number' : new_stud['number']}
   return jsonify({'result' : output})
 
+@app.route('/student/modify', methods=['POST'])
+def modify_one_student():
+  stud = mongo.db.myCollection
+  student = request.json['student']
+  number = request.json['number']
+  modify_id = request.json['id'] #需修改的学生id
+  s = stud.find_one({'id' : modify_id})
+  if s:
+    stud.update_one(
+      {"id" : modify_id},
+      {"$set":{"student" : student, "number" : number}}
+    )
+    output = {'student' : student, 'id' : modify_id, 'number' : number}
+    
+  else:
+    output = "No such student"
+  return jsonify({'result' : output})
+
 if __name__ == '__main__':
     app.run(debug=True)
