@@ -1,13 +1,16 @@
 from flask import Flask
 from flask import jsonify
 from flask import request
+from flask import Response,make_response
+from flask_cors import CORS
 from flask_pymongo import PyMongo
+import pdb
 
 app = Flask(__name__)
 
 app.config['MONGO_DBNAME'] = 'mydb'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydb'
-
+CORS(app, resources=r'/*') #跨域请求
 mongo = PyMongo(app)
 
 @app.route('/student', methods=['GET'])
@@ -20,9 +23,11 @@ def get_all_students():
 
 @app.route('/student/find', methods=['POST'])
 def get_one_student():
+  data = request.json
   stud = mongo.db.myCollection
-  idd = request.json['id']
+  idd = data['id']
   s = stud.find_one({'id' : idd})
+  print(s)
   if s:
     output = {'student' : s['student'], 'id' : s['id'], 'number' : s['number']}
   else:
@@ -68,4 +73,7 @@ def modify_one_student():
   return jsonify({'result' : output})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(
+      host = '192.168.147.149',
+        port = 7777,  
+        debug = True )
